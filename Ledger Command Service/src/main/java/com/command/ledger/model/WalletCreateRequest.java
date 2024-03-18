@@ -1,0 +1,22 @@
+package com.command.ledger.model;
+
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.NotNull;
+import lombok.*;
+
+import java.math.BigDecimal;
+
+@Data
+@Getter
+@Setter
+@NoArgsConstructor
+@AllArgsConstructor
+public class WalletCreateRequest {
+
+    @NotNull
+    private String assetType;
+
+    @NotNull
+    @NotBlank
+    private BigDecimal balance;
+}
