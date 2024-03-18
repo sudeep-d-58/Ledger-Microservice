@@ -6,10 +6,10 @@ import lombok.*;
 @Data
 @Getter
 @Setter
-@AllArgsConstructor
 @NoArgsConstructor
-public class TransactionDetails {
+@AllArgsConstructor
+public class EnumWrapper {
 
     @NotNull
-    private TransactionState transactionState;
+    private String value;
 }

@@ -6,6 +6,7 @@ import com.command.ledger.exception.NotSupportedException;
 import com.command.ledger.model.*;
 import com.command.ledger.publisher.MessagePublisher;
 import com.command.ledger.repository.WalletRepository;
+import com.command.ledger.util.Utility;
 import jakarta.transaction.Transactional;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -94,7 +95,17 @@ public class WalletService {
         }
         wallet.setPrevBalance(wallet.getCurrBalance());
         wallet.setCurrBalance(newBalance.getNewBalance());
-        MessageEvent messageEvent = new MessageEvent();
+        HistoricalBalance historicalBalance = new HistoricalBalance();
+        historicalBalance.setCurrBalance(wallet.getCurrBalance());
+        historicalBalance.setPrevBalance(wallet.getPrevBalance());
+        historicalBalance.setWalletId(wallet.getWalletId());
+        historicalBalance.setAccountState(wallet.getAccount().getAccountState());
+        historicalBalance.setTransactionId(null);
+        historicalBalance.setAmount(newBalance.getNewBalance());
+        historicalBalance.setEventType("Wallet Update");
+        historicalBalance.setDate(new Date());
+        MessageEvent messageEvent = new MessageEvent(Utility.Wallet_Data_Publisher_1, historicalBalance);
+        messagePublisher.publish(messageEvent);
         return walletRepository.save(wallet);
     }
 }

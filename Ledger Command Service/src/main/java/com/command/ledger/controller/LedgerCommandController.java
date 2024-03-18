@@ -38,7 +38,10 @@ public class LedgerCommandController {
     }
 
     @PostMapping("/add/wallet/{accountId}")
-    public ResponseEntity<Wallet> addWallet(@PathVariable long accountId, @RequestBody WalletCreateRequest walletCreateRequest) throws NotFoundException, NotSupportedException {
+    public ResponseEntity<Wallet> addWallet(@PathVariable long accountId, @RequestBody WalletCreateRequest walletCreateRequest) throws NotFoundException, NotSupportedException, AmountLessThanZeroException {
+        if(walletCreateRequest.getBalance().compareTo(BigDecimal.ZERO) < 0){
+            throw new AmountLessThanZeroException("Balance amount should be greater than 0.0");
+        }
         Wallet wallet = accountService.addWallet(accountId, walletCreateRequest);
         return new ResponseEntity<>(wallet, HttpStatus.CREATED);
     }
@@ -67,9 +70,12 @@ public class LedgerCommandController {
         return  ResponseEntity.ok().build();
     }
 
-    @PutMapping("/changeState/account/{accountId}")
-    public ResponseEntity<Void> changeAccountState(@PathVariable @NotNull Long accountId, @RequestParam(required = true) AccountState accountState) throws NotFoundException, AccountStateChangeException {
-        accountService.changeAccountState(accountId, accountState);
+    @PatchMapping("/changeState/account/{accountId}")
+    public ResponseEntity<Void> changeAccountState(@PathVariable @NotNull Long accountId, @RequestBody EnumWrapper accountState) throws NotFoundException, AccountStateChangeException, NotSupportedException {
+        if(!List.of(AccountState.CLOSED.getDescription(), AccountState.OPEN.getDescription()).contains(accountState.getValue())){
+            throw new NotSupportedException("Unidentified Account State. Please provide from OPEN/CLOSED");
+        }
+        accountService.changeAccountState(accountId, accountState.getValue().equalsIgnoreCase(AccountState.CLOSED.getDescription()) ? AccountState.CLOSED: AccountState.OPEN);
         return ResponseEntity.ok().build();
     }
 
@@ -81,7 +87,7 @@ public class LedgerCommandController {
 
 
     @PatchMapping("/transaction/{transactionId}/changeState")
-    public ResponseEntity<Transaction> updateTransactionStatus(@PathVariable Long transactionId, @RequestParam TransactionDetails transactionDetails) throws NotSupportedException, NotFoundException {
+    public ResponseEntity<Transaction> updateTransactionStatus(@PathVariable @NotNull Long transactionId, @RequestParam TransactionDetails transactionDetails) throws NotSupportedException, NotFoundException {
         if(!List.of(TransactionState.CLEARED, TransactionState.FAILED, TransactionState.PENDING).contains(transactionDetails.getTransactionState())){
             throw new NotSupportedException("Unidentified Transaction State. Please provide from PENDING/CLEARED/FAILED");
         }
