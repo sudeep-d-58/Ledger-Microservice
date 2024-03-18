@@ -96,3 +96,6 @@ Example Response Payload:
     ]
 
 Assumption : Returns Empty List in case of Data not present
+
+
+**All times are stored in UTC. Please use respective UTC time to query results**
