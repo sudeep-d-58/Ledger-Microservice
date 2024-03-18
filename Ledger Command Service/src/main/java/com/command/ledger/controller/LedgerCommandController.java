@@ -87,7 +87,7 @@ public class LedgerCommandController {
 
 
     @PatchMapping("/transaction/{transactionId}/changeState")
-    public ResponseEntity<Transaction> updateTransactionStatus(@PathVariable @NotNull Long transactionId, @RequestParam TransactionDetails transactionDetails) throws NotSupportedException, NotFoundException {
+    public ResponseEntity<Transaction> updateTransactionStatus(@PathVariable @NotNull Long transactionId, @RequestBody TransactionDetails transactionDetails) throws NotSupportedException, NotFoundException {
         if(!List.of(TransactionState.CLEARED, TransactionState.FAILED, TransactionState.PENDING).contains(transactionDetails.getTransactionState())){
             throw new NotSupportedException("Unidentified Transaction State. Please provide from PENDING/CLEARED/FAILED");
         }
