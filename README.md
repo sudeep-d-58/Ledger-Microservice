@@ -31,7 +31,7 @@ Keeping in mind the requirement, The Ledger Microservice internally runs two ser
 1. To serve to write requests
 2. to Serve to read requests.
 
-This is done using the CQRS Pattern. The Databases are synced by kafka broker.
+This is done using the CQRS Pattern. The Databases are synced by kafka broker. All times configured to be in UTC.
 
 
     **Ledger-Command-Service**
