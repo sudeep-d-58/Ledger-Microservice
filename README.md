@@ -15,7 +15,7 @@ zookeeper
 
 Docker Installed. 
 Docker Compose Installed. 
-Postman to test REST Endpoints.
+Postman to test REST Endpoints (Can test with swagger also, links below in Architecture section)
 
 
 **Run :**
@@ -47,6 +47,7 @@ Wallet(to store the data of wallets) and transaction(to store all transaction).
 * We can easily update the event objects as per our requirement.
 * interaction with Client is via Rest Endpoints , but can be converted to Async(Listening to events and consuming and processing them) if needed.
 * Specific Usage Manual is available in Ledger-Command-Service/LedgerCommands.md file.
+* Swagger URL : http://localhost:8080/swagger-ui/index.html#/
 
     **Ledger Query Service**
 * This service is running in 8081 port and serving to all read requests. It is using its own mysql database with 1 main table Historical_Balance_Data. This is used to store all wallet
@@ -54,4 +55,5 @@ activities.
 * This service consumes Wallet Balance Change Activity event and uses them to store into DB. The Database is configurable and can be updated as needed with necessary fields.
 * Since this is dockerized , this can be scaled in an container env as needed.
 * Specific Usage Manual is available in Ledger Query Service/UserInstructions.md file.
+* Swagger URL : http://localhost:8081/swagger-ui/index.html#
 
