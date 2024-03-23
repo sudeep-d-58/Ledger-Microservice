@@ -10,7 +10,7 @@ Example Payload :
     "entityId": "8743"
     }
 
-Assumptions: Account can be created without an Wallet Being Present. An entity can hve multiple accounts. No checks
+Assumptions: Account can be created without an Wallet Being Present. An entity can have multiple accounts. No checks
 
 
 **Wallet Addition to Account**

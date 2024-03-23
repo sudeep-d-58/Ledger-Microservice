@@ -14,6 +14,7 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.math.BigDecimal;
 import java.util.Date;
 
 @Service
@@ -50,6 +51,20 @@ public class AccountService {
             throw new AlreadyClosedException("Account with accountId : " + accountId + " is already closed.");
         }
         account.setAccountState(AccountState.CLOSED);
+        account.getWallets().forEach(acc -> {
+            HistoricalBalance historicalBalance = new HistoricalBalance();
+            historicalBalance.setCurrBalance(acc.getCurrBalance());
+            historicalBalance.setPrevBalance(acc.getCurrBalance());
+            historicalBalance.setWalletId(acc.getWalletId());
+            historicalBalance.setAccountState(AccountState.CLOSED);
+            historicalBalance.setTransactionId(null);
+            historicalBalance.setAmount(null);
+            historicalBalance.setEventType("Account Close Event");
+            historicalBalance.setDate(new Date());
+            MessageEvent accountCloseEvent = new MessageEvent(Utility.Wallet_Data_Publisher_1, historicalBalance);
+            messagePublisher.publish(accountCloseEvent);
+        });
+        log.info("Account " + accountId + " is closed now");
         accountRepository.save(account);
     }
 
@@ -60,6 +75,21 @@ public class AccountService {
         if (state == accountState) {
             log.info("Account with accountId : " + accountId + " is already in " + accountState + " state");
             throw new AccountStateChangeException("Account with accountId : " + accountId + " is already in " + accountState + " state");
+        }
+        if (accountState == AccountState.CLOSED) {
+            account.getWallets().forEach(acc -> {
+                HistoricalBalance historicalBalance = new HistoricalBalance();
+                historicalBalance.setCurrBalance(acc.getCurrBalance());
+                historicalBalance.setPrevBalance(acc.getCurrBalance());
+                historicalBalance.setWalletId(acc.getWalletId());
+                historicalBalance.setAccountState(accountState);
+                historicalBalance.setTransactionId(null);
+                historicalBalance.setAmount(null);
+                historicalBalance.setEventType("Account Close Event");
+                historicalBalance.setDate(new Date());
+                MessageEvent accountCloseEvent = new MessageEvent(Utility.Wallet_Data_Publisher_1, historicalBalance);
+                messagePublisher.publish(accountCloseEvent);
+            });
         }
         account.setAccountState(accountState);
         accountRepository.save(account);
